@@ -48,7 +48,7 @@ public class AdminController {
         return "edit";
     }
     @PatchMapping("/admin/{id}")
-    public String updateUser(@ModelAttribute("user") User user, @RequestParam(value = "nameRoles", required = false) String[] roles) {
+    public String updateUser(@ModelAttribute("user") User user, String[] roles) {
         userService.setRoleByUser(user,roles);
         userService.create(user);
         return "redirect:/admin";
