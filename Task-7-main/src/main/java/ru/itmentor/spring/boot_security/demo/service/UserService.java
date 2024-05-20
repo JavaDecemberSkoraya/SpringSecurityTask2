@@ -13,4 +13,8 @@ public interface UserService {
     User setRoleByUser (User user, String[] roles);
 
     List<User> getUserByUsername (String name);
+
+    List<User> getList();
+
+    void updateUser(Long id, User newUser);
 }

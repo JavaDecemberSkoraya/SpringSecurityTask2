@@ -1,83 +1,76 @@
-package ru.itmentor.spring.boot_security.demo.RestController;
+package ru.itmentor.spring.boot_security.demo.restController;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ru.itmentor.spring.boot_security.demo.model.User;
 import ru.itmentor.spring.boot_security.demo.service.RoleService;
 import ru.itmentor.spring.boot_security.demo.service.UserService;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 public class AdminRestController {
     private final UserService userService;
-    private final RoleService roleService;
+
 
     @Autowired
-    public AdminRestController(UserService userService, RoleService roleService) {
+    public AdminRestController(UserService userService) {
         this.userService = userService;
-        this.roleService = roleService;
+
     }
 
 
-    @GetMapping
-    public ModelAndView getAllUsers(){
-        ModelAndView modelAndView = new ModelAndView("index");
-        modelAndView.addObject("users", userService.getUserAndRoles());
-        return modelAndView;
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userService.getList());
     }
 
 
-    @GetMapping("/new")
-    public ModelAndView saveUserForm() {
-        ModelAndView modelAndView = new ModelAndView("new"); // Имя представления new_user.html
-        modelAndView.addObject("roles", roleService.getAllRoles());
-        modelAndView.addObject("user", new User());
-        return modelAndView;
+    @PostMapping("/create")
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        try {
+            userService.create(user);
+            return new ResponseEntity<User>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<User>(user, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
-
-    @PostMapping
-    public ModelAndView createUser(@ModelAttribute("user") User user, @RequestParam(value = "nameRoles", required = false) String[] roles) {
-        userService.setRoleByUser(user, roles);
-        userService.create(user);
-        return new ModelAndView("redirect:/admin");
-    }
-
 
 
     @DeleteMapping("/{id}")
-    public ModelAndView deleteUser (@PathVariable("id") Long id){
-        userService.delete(id);
-        return new ModelAndView("redirect:/admin");
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+
+        try {
+            userService.delete(id);
+            return new ResponseEntity<>("User deleted", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("User not deleted", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+
     }
 
 
-    @GetMapping("/{id}")
-    public ModelAndView getUserById (@PathVariable("id") Long id){
-        ModelAndView modelAndView = new ModelAndView("show");
-        modelAndView.addObject("user", userService.getUserById(id));
-        return modelAndView;
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
 
-    @PatchMapping("/{id}")
-    public ModelAndView updateUser(@PathVariable("id") Long id,
-                                   @RequestParam(value = "nameRoles", required = false) String[] roles,
-                                   @ModelAttribute User user) {
-        user.setId(id);
-        userService.setRoleByUser(user, roles);
-        userService.create(user);
-        return new ModelAndView("redirect:/admin");
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User newUser) {
+try {
+userService.updateUser(id, newUser);
+    return new ResponseEntity<User>(newUser, HttpStatus.OK);
+}
+catch (Exception e){
+    return new ResponseEntity<User>(newUser, HttpStatus.INTERNAL_SERVER_ERROR);
+}
     }
 
 
-
-    @GetMapping("/{id}/edit")
-    public ModelAndView  edit(@PathVariable("id") Long id) {
-        ModelAndView modelAndView = new ModelAndView("edit");
-        modelAndView.addObject("roles",roleService.getAllRoles());
-        modelAndView.addObject("user", userService.getUserById(id));
-        return modelAndView;
-    }
 }

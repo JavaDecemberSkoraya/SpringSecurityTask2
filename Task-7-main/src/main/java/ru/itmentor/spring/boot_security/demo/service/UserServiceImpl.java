@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.itmentor.spring.boot_security.demo.configs.PasswordEncoderConfig;
 import ru.itmentor.spring.boot_security.demo.model.User;
 import ru.itmentor.spring.boot_security.demo.repository.UserRepository;
 
@@ -19,9 +20,12 @@ public class UserServiceImpl implements UserDetailsService, UserService{
     private final UserRepository userRepository;
     private final RoleService roleService;
 
-    public UserServiceImpl(UserRepository userRepository, RoleService roleService) {
+    private final PasswordEncoderConfig passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepository, RoleService roleService, PasswordEncoderConfig passwordEncoder) {
         this.userRepository = userRepository;
         this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -65,6 +69,21 @@ public class UserServiceImpl implements UserDetailsService, UserService{
         List<User> list = new ArrayList<>();
         list.add(userRepository.findByUsername(name));
         return list;
+    }
+
+    @Override
+    public List<User> getList() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public void updateUser(Long id, User newUser) {
+        User existingUser = userRepository.findById(id).orElse(null);
+        existingUser.setUsername(newUser.getUsername());
+        String encodedPassword = passwordEncoder.passwordEncoder().encode(newUser.getPassword());
+        existingUser.setPassword(encodedPassword);
+        existingUser.setRoles(newUser.getRoles());
+        userRepository.save(existingUser);
     }
 
     @Override
