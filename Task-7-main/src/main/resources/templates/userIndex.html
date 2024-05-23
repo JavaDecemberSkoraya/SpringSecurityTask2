@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Users</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("/api/user")
+                .then(response => response.json())
+                .then(users => {
+                    const usersTable = document.getElementById("users-table");
+                    users.forEach(user => {
+                        let row = usersTable.insertRow();
+                        row.innerHTML = `
+                            <td><a href="/user/${user.id}">${user.id}</a></td>
+                            <td><a href="/user/${user.id}">${user.username}</a></td>
+                            <td><a href="/user/${user.id}">${user.lastName}</a></td>
+                            <td><a href="/user/${user.id}">${user.age}</a></td>
+                            <td><a href="/user/${user.id}">${user.email}</a></td>
+                        `;
+                    });
+                });
+        });
+    </script>
+    <style>
+        table {
+            font-family: "Times New Roman", Times, serif;
+            border: 2px solid #4F7849;
+            background-color: #EEEEEE;
+            width: 50%;
+            height: 50px;
+            text-align: center;
+            border-collapse: collapse;
+        }
+        table.comicGreen td, table.comicGreen th {
+            border: 1px solid #4F7849;
+            padding: 3px 2px;
+        }
+        table.comicGreen tbody td {
+            font-size: 19px;
+            font-weight: bold;
+            color: #4F7849;
+        }
+        table.comicGreen tr:nth-child(even) {
+            background: #CEE0CC;
+        }
+        table.comicGreen tfoot td {
+            font-size: 21px;
+        }
+    </style>
+</head>
+<body>
+<br/>
+<br/>
+<table id="users-table" class="comicGreen">
+    <tr>
+        <th colspan="5" text-align="center">Пользователи</th>
+        <th></th>
+    </tr>
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Возраст</th>
+        <th>E-mail</th>
+    </tr>
+</table>
+<br>
+<form action="/logout">
+    <button type="submit">Выйти</button>
+</form>
+</body>
+</html>
