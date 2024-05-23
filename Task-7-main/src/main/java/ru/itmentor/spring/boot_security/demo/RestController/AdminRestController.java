@@ -32,25 +32,24 @@ public class AdminRestController {
 
     @PostMapping("/create")
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        try {
-            userService.create(user);
-            return new ResponseEntity<User>(user, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<User>(user, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+if (userService.create(user)){
+    return new ResponseEntity<User>(user, HttpStatus.OK);
+}
+else {
+    return new ResponseEntity<User>(user, HttpStatus.INTERNAL_SERVER_ERROR);
+}
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
 
-        try {
-            userService.delete(id);
-            return new ResponseEntity<>("User deleted", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("User not deleted", HttpStatus.INTERNAL_SERVER_ERROR);
 
+        if (userService.delete(id)){
+            return new ResponseEntity<>("User deleted", HttpStatus.OK);
         }
+        else return new ResponseEntity<>("User not deleted", HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 
@@ -63,13 +62,11 @@ public class AdminRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User newUser) {
-try {
-userService.updateUser(id, newUser);
-    return new ResponseEntity<User>(newUser, HttpStatus.OK);
-}
-catch (Exception e){
-    return new ResponseEntity<User>(newUser, HttpStatus.INTERNAL_SERVER_ERROR);
-}
+
+        if (userService.updateUser(id, newUser)){
+            return new ResponseEntity<User>(newUser, HttpStatus.OK);
+        }
+        else return new ResponseEntity<User>(newUser, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
